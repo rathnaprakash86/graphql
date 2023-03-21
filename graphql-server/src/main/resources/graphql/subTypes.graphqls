@@ -1,0 +1,71 @@
+
+type Employee {
+    employeeId : ID!
+    firstName : String
+    lastName : String
+    email : String
+    hireDate : Date
+    jobId : Int
+    salary : Float
+    managerId : Int
+    departmentId :Int   
+    jobInfo: JobInfo    
+    departmentInfo : DepartmentInfo
+}
+
+type DepartmentEmployees {
+     departmentId : ID
+     departmentName : String
+     locationId : Int
+     loctionInfo : LoctionInfo
+     employee :[Employee]
+}
+
+type JobInfo {
+    jobId : ID
+    jobTitle : String
+    maxSalary : Float
+    minSalary : Float
+}
+
+type DepartmentInfo {
+    departmentId : ID
+    departmentName : String
+    locationId : Int
+    loctionInfo : LoctionInfo
+}
+
+type LoctionInfo {
+    locationId : Int
+    streeAddress : String
+    postalCode :String
+    city : String
+    countryId : String 
+    countryInfo : CountryInfo
+}
+
+
+type CountryInfo{
+    countryId :String
+    countryName :String
+    region_id :Int
+    regionInfo : RegionInfo
+}
+
+type RegionInfo {
+    regionId :Int
+    regionName : String
+}
+
+
+input EmployeeInput {
+    employeeId : ID
+    firstName : String
+    lastName : String
+    email : String
+    hireDate : Date
+    jobId : Int
+    salary : Float
+    managerId : Int
+    departmentId :Int 
+}

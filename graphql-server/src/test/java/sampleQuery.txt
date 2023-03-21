@@ -1,0 +1,30 @@
+
+mutation {
+  addEmployee(employeeInput: {
+    firstName: "rathna", 
+    lastName: "prakash"
+    email:"test@test.com"
+    hireDate:"2007-12-03",
+    jobId:9,
+    salary:5000.00,
+    managerId:100,
+    departmentId:9
+  }) {
+    email
+    employeeId
+  }
+}
+
+
+subscription{
+  allEmployee {
+    firstName
+    lastName
+    email
+    hireDate
+    jobId
+    salary
+    managerId
+    departmentId
+  }
+}

@@ -1,0 +1,17 @@
+# java.util.Date implementation
+scalar Date
+
+type Query { 
+    employee(employeeId : ID!) : Employee
+    departments :[DepartmentInfo]
+    departmentEmployees : [DepartmentEmployees]
+}
+
+type Mutation {
+    addEmployee(employeeInput : EmployeeInput) : Employee
+}
+
+
+type Subscription {
+    allEmployee: Employee
+}
