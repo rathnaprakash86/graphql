@@ -28,3 +28,10 @@ subscription{
     departmentId
   }
 }
+query {
+  employee(employeeId :100){
+   firstName
+   lastName
+   email
+  }
+}
