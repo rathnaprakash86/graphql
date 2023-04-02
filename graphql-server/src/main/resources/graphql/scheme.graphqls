@@ -1,6 +1,24 @@
 # java.util.Date implementation
 scalar Date
 
+# java.time.LocalDate implementation
+scalar LocalDate
+
+# java.time.LocalDateTime implementation
+scalar LocalDateTime
+
+# java.time.LocalTime implementation
+scalar LocalTime
+
+# java.time.OffsetDateTime implementation
+scalar OffsetDateTime
+
+# java.time.YearMonth implementation
+scalar YearMonth
+
+# java.time.Duration implementation
+scalar Duration
+
 type Query { 
     employee(employeeId : ID!) : Employee
     departments :[DepartmentInfo]

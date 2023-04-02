@@ -13,6 +13,8 @@ import com.rathna.consulting.entity.Location;
 import com.rathna.consulting.service.DepartmentService;
 import com.rathna.consulting.service.EmployeeService;
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Controller
 @Log4j2
@@ -26,13 +28,13 @@ public class DepartmentController {
 
 
   @QueryMapping(name = "departments")
-  public List<Department> getDepartmentsAll() {
+  public Flux<Department> getDepartmentsAll() {
     return departmentService.getAllDepartments();
   }
 
 
   @QueryMapping(name = "departmentEmployees")
-  public List<Department> getDepartmentEmployee() {
+  public Flux<Department> getDepartmentEmployee() {
     return departmentService.getAllDepartments();
   }
 
@@ -41,9 +43,8 @@ public class DepartmentController {
    * N+1 or more problems
    */
   @SchemaMapping(typeName = "DepartmentEmployees", field = "loctionInfo")
-  public Location getLocationById(Department department) {
-
-    Location location = employeeService.getLocationById(department.getLocationId());
+  public Mono<Location> getLocationById(Department department) {
+    Mono<Location> location = employeeService.getLocationById(department.getLocationId());
     return location;
   }
 

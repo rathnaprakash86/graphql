@@ -1,25 +1,12 @@
 spring:
-  datasource:
-    driverClassName: org.h2.Driver
-    password: password
-    url: jdbc:h2:mem:testdb
-    username: sa
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        trace: false
-        web-allow-others: false
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: none
-    show-sql: false
   application:
-    name: GraphQL-Server     
- 
+    name: GraphQL-Server
   graphql:
     graphiql:
       enabled: true
+    websocket:
+      path: /graphql
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/learnings
+    username: learner
+    password: password

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import com.rathna.consulting.pojo.EmployeeDetails;
+import reactor.core.publisher.Mono;
 
 @SpringBootTest
 public class EmployeeServiceTest {
@@ -14,9 +15,9 @@ public class EmployeeServiceTest {
   @Test
   void testGetEmployeeDetailsById() {
 
-    EmployeeDetails employeeDetails = employeeService.getEmployeeDetailsById(100);
+    Mono<EmployeeDetails> employeeDetails = employeeService.getEmployeeDetailsById(100);
+    employeeDetails.subscribe(System.out::print);
 
-    System.out.println(employeeDetails.toString());
   }
 
 }

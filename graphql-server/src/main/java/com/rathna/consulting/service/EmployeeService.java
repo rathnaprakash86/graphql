@@ -1,9 +1,9 @@
 package com.rathna.consulting.service;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import com.rathna.consulting.entity.Country;
 import com.rathna.consulting.entity.Department;
 import com.rathna.consulting.entity.Dependent;
@@ -20,6 +20,8 @@ import com.rathna.consulting.repository.JobRepository;
 import com.rathna.consulting.repository.LocationRepository;
 import com.rathna.consulting.repository.RegionRepository;
 import com.rathna.consulting.web.EmployeeController.EmployeeInput;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class EmployeeService {
@@ -39,76 +41,82 @@ public class EmployeeService {
   @Autowired
   private RegionRepository regionRepository;
 
-
-  public EmployeeDetails getEmployeeDetailsById(Integer empId) {
+  /**
+   * Blocking way
+   * 
+   * @param empId
+   * @return
+   */
+  public Mono<EmployeeDetails> getEmployeeDetailsById(Integer empId) {
 
     EmployeeDetails employeeDetails = EmployeeDetails.builder().build();
-    Optional<Employee> employee = getEmployeeById(empId);
+    Mono<Employee> employeeMono = getEmployeeById(empId);
 
-    if (!employee.isEmpty()) {
-      employeeDetails.setEmployee(employee.get());
-      employeeDetails.setDependents(getDependentsByEmployeeId(empId));
-      employeeDetails.setJob(getJobDetailsById(employee.get().getJobId()));
-      employeeDetails.setDepartment(getDepartmentDetailsById(employee.get().getDepartmentId()));
+
+    Employee employee = employeeMono.block();
+
+    if (!ObjectUtils.isEmpty(employee)) {
+      employeeDetails.setEmployee(employee);
+      employeeDetails.setDependents(getDependentsByEmployeeId(empId).collectList().block());
+      employeeDetails.setJob(getJobDetailsById(employee.getJobId()).block());
+      employeeDetails.setDepartment(getDepartmentDetailsById(employee.getDepartmentId()).block());
       if (employeeDetails.getDepartment() != null
           && employeeDetails.getDepartment().getLocationId() != null) {
         employeeDetails
-            .setLocation(getLocationById(employeeDetails.getDepartment().getLocationId()));
-        employeeDetails.setCountry(getCountryById(employeeDetails.getLocation().getCountryId()));
-        employeeDetails.setRegion(getRegionById(employeeDetails.getCountry().getRegionId()));
+            .setLocation(getLocationById(employeeDetails.getDepartment().getLocationId()).block());
+        employeeDetails
+            .setCountry(getCountryById(employeeDetails.getLocation().getCountryId()).block());
+        employeeDetails
+            .setRegion(getRegionById(employeeDetails.getCountry().getRegionId()).block());
 
       }
     }
 
-    return employeeDetails;
+    return Mono.just(employeeDetails);
 
   }
 
-  public Optional<Employee> getEmployeeById(Integer empId) {
-    Optional<Employee> employee = employeeRepository.findById(empId);
+  public Mono<Employee> getEmployeeById(Integer empId) {
+    Mono<Employee> employee = employeeRepository.findById(empId);
     return employee;
   }
 
-  public Region getRegionById(Integer regionId) {
-    return regionRepository.findById(regionId).get();
+  public Mono<Region> getRegionById(Integer regionId) {
+    return regionRepository.findById(regionId);
   }
 
-  public Country getCountryById(String countryId) {
-    return countryRepository.findById(countryId).get();
+  public Mono<Country> getCountryById(String countryId) {
+    return countryRepository.findById(countryId);
   }
 
-  public Location getLocationById(Integer locationId) {
-    return locationRepository.findById(locationId).get();
+  public Mono<Location> getLocationById(Integer locationId) {
+    return locationRepository.findById(locationId);
   }
 
-  public Department getDepartmentDetailsById(Integer departmentId) {
-
-    Optional<Department> department = departmentRepository.findById(departmentId);
-
-    return (department.isPresent()) ? department.get() : null;
+  public Mono<Department> getDepartmentDetailsById(Integer departmentId) {
+    return departmentRepository.findById(departmentId);
   }
 
-  public JobInfo getJobDetailsById(Integer jobId) {
+  public Mono<JobInfo> getJobDetailsById(Integer jobId) {
 
-    Optional<JobInfo> job = jobRepository.findById(jobId);
+    return jobRepository.findById(jobId);
 
-    return job.get();
   }
 
-  public List<Dependent> getDependentsByEmployeeId(Integer empId) {
+  public Flux<Dependent> getDependentsByEmployeeId(Integer empId) {
 
-    List<Dependent> dependents = dependentRepository.findByEmployeeId(empId);
+    Flux<Dependent> dependents = dependentRepository.findByEmployeeId(empId);
 
     return dependents;
 
   }
 
-  // public Flux<Employee> allEmployees() {
-  // return employeeReactiveRepository.findAll().delayElements(Duration.ofSeconds(3));
-  //
-  // }
+  public Flux<Employee> allEmployees() {
+    return employeeRepository.findAll().delayElements(Duration.ofSeconds(3));
 
-  public Employee createUpdateEmployee(EmployeeInput input) {
+  }
+
+  public Mono<Employee> createUpdateEmployee(EmployeeInput input) {
 
     Employee employee = Employee.builder().employeeId(input.employeeId())
         .firstName(input.firstName()).lastName(input.lastName()).email(input.email())

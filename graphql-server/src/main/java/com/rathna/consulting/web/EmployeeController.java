@@ -6,6 +6,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.graphql.data.method.annotation.SubscriptionMapping;
 import org.springframework.stereotype.Controller;
 import com.rathna.consulting.entity.Country;
 import com.rathna.consulting.entity.Department;
@@ -16,6 +17,8 @@ import com.rathna.consulting.entity.Region;
 import com.rathna.consulting.pojo.EmployeeDetails;
 import com.rathna.consulting.service.EmployeeService;
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Controller
 @Log4j2
@@ -25,55 +28,56 @@ public class EmployeeController {
   private EmployeeService employeeService;
 
   @QueryMapping(name = "employeeDetails")
-  public EmployeeDetails getEmployeeDetailsById(@Argument Integer employeeId) {
+  public Mono<EmployeeDetails> getEmployeeDetailsById(@Argument Integer employeeId) {
     return employeeService.getEmployeeDetailsById(employeeId);
   }
 
 
   @QueryMapping(name = "employee")
-  public Employee getEmployeeById(@Argument Integer employeeId) {
-    return employeeService.getEmployeeById(employeeId).get();
+  public Mono<Employee> getEmployeeById(@Argument Integer employeeId) {
+    return employeeService.getEmployeeById(employeeId);
   }
 
   @SchemaMapping
-  public JobInfo jobInfo(Employee employee) {
+  public Mono<JobInfo> jobInfo(Employee employee) {
     log.info("Job ID {}", employee.getJobId());
-    JobInfo jobInfo = employeeService.getJobDetailsById(employee.getJobId());
+    Mono<JobInfo> jobInfo = employeeService.getJobDetailsById(employee.getJobId());
     return jobInfo;
   }
 
   @SchemaMapping(typeName = "Employee", field = "departmentInfo")
-  public Department getDepartmentById(Employee employee) {
+  public Mono<Department> getDepartmentById(Employee employee) {
     log.info("Department ID {}", employee.getDepartmentId());
-    Department department = employeeService.getDepartmentDetailsById(employee.getDepartmentId());
+    Mono<Department> department =
+        employeeService.getDepartmentDetailsById(employee.getDepartmentId());
     return department;
   }
 
   @SchemaMapping(typeName = "DepartmentInfo", field = "loctionInfo")
-  public Location getLocationById(Department department) {
+  public Mono<Location> getLocationById(Department department) {
     log.info("Location ID {}", department.getLocationId());
-    Location location = employeeService.getLocationById(department.getLocationId());
+    Mono<Location> location = employeeService.getLocationById(department.getLocationId());
     return location;
   }
 
   @SchemaMapping(typeName = "LoctionInfo", field = "countryInfo")
-  public Country getCountryById(Location location) {
+  public Mono<Country> getCountryById(Location location) {
     log.info("Country ID {}", location.getCountryId());
-    Country country = employeeService.getCountryById(location.getCountryId());
+    Mono<Country> country = employeeService.getCountryById(location.getCountryId());
     return country;
   }
 
   @SchemaMapping(typeName = "CountryInfo", field = "regionInfo")
-  public Region getCountryById(Country country) {
+  public Mono<Region> getCountryById(Country country) {
     log.info("Region ID {}", country.getRegionId());
-    Region region = employeeService.getRegionById(country.getRegionId());
+    Mono<Region> region = employeeService.getRegionById(country.getRegionId());
     return region;
   }
 
-  // @SubscriptionMapping
-  // public Flux<Employee> allEmployees() {
-  // return employeeService.allEmployees();
-  // }
+  @SubscriptionMapping
+  public Flux<Employee> allEmployees() {
+    return employeeService.allEmployees();
+  }
 
 
   public record EmployeeInput(Integer employeeId, String firstName, String lastName, String email,
@@ -82,7 +86,7 @@ public class EmployeeController {
   }
 
   @MutationMapping
-  public Employee addEmployee(@Argument EmployeeInput employeeInput) {
+  public Mono<Employee> addEmployee(@Argument EmployeeInput employeeInput) {
     log.info("{}", employeeInput.toString());
     return employeeService.createUpdateEmployee(employeeInput);
   }

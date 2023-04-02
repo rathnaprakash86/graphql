@@ -10,6 +10,7 @@ import com.rathna.consulting.entity.Employee;
 import com.rathna.consulting.repository.DepartmentRepository;
 import com.rathna.consulting.repository.EmployeeRepository;
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Flux;
 
 
 @Service
@@ -23,7 +24,7 @@ public class DepartmentService {
   private DepartmentRepository departmentRepository;
 
 
-  public List<Department> getAllDepartments() {
+  public Flux<Department> getAllDepartments() {
     return departmentRepository.findAll();
   }
 

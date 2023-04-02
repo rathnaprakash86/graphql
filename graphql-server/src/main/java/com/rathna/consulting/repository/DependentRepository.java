@@ -1,14 +1,12 @@
 package com.rathna.consulting.repository;
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import com.rathna.consulting.entity.Dependent;
+import reactor.core.publisher.Flux;
 
-public interface DependentRepository extends JpaRepository<Dependent,Integer> {
-	
-	public List<Dependent> findByEmployeeId(Integer emp_id);
+public interface DependentRepository extends ReactiveCrudRepository<Dependent, Integer> {
+
+  public Flux<Dependent> findByEmployeeId(Integer emp_id);
 
 
 }
