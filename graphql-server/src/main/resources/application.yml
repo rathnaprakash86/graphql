@@ -8,5 +8,5 @@ spring:
       path: /graphql
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/learnings
-    username: learner
-    password: password
+    username: 
+    password: 
